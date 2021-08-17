@@ -7,7 +7,8 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Alert
+  Alert,
+  Platform
 } from 'react-native';
 
 // definition of color options
@@ -55,7 +56,7 @@ export default class Start extends Component {
               <Text style={styles.text}>
                 Choose Background Color:
               </Text>
-              <View style={[styles.wrapper, styles.colorWrapper]}>
+              <View style={[styles.wrapper, styles.colorWrapper]} accessibilityRole='radiogroup'>
                 {/* map colors of colorOptions to one button each*/}
                 {/*if the button is the selected color one, apply the styling rules of 'border' [make it a circle instead of a rectangular]*/}
                 {colorOptions.map((color) => (
@@ -63,7 +64,8 @@ export default class Start extends Component {
                     accessible={true}
                     accessibilityLabel="Select Background Color"
                     accessibilityHint="Selects the background color of the chat screen"
-                    accessibilityRole="button"
+                    accessibilityRole="radio"
+                    accessibilityState={(color === this.state.backgroundColor) ? { selected: true } : { selected: false }}
                     style={[styles.colorOptions(color),
                     color === this.state.backgroundColor ? styles.border : null]}
                     key={color}

@@ -33,19 +33,28 @@ export default class Chat extends Component {
     });
   }
 
+  // when a user sends a message it will be appended to the local messages state
   onSend (messages = []) {
     this.setState((previousState) => ({
       messages: GiftedChat.append(previousState.messages, messages),
     }));
   }
 
+  // '#090C08', '#474056', '#8A95A5', '#B9C6AE';
+  // customize message bubble appearances
   renderBubble (props) {
+    const { backgroundColor } = this.props.route.params;
     return (
       <Bubble
         {...props}
         wrapperStyle={{
           right: {
-            backgroundColor: '#000'
+            backgroundColor: backgroundColor === '#090C08' ? '#8A95A5' :
+              (backgroundColor === '#474056' || backgroundColor === '#8A95A5') ? '#B9C6AE' : '#474056'
+          },
+          left: {
+            backgroundColor: backgroundColor === '#090C08' ? '#B9C6AE' :
+              (backgroundColor === '#474056' || backgroundColor === '#8A95A5') ? '#090C08' : '#8A95A5'
           }
         }}
       />
@@ -70,11 +79,14 @@ export default class Chat extends Component {
           isTyping={true}
           alwaysShowSend={true}
         />
+        {/* ensure the keyboard won't hide the messages for android*/}
         {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null}
       </View>
     );
   }
 };
+
+// TODO: add accessibility props to the action button implemented
 
 const styles = StyleSheet.create({
   container: {
