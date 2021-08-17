@@ -13,15 +13,15 @@ export default class Start extends Component {
     };
   }
 
-  goToChat = () => {
+  goToChat = (name, backgroundColor) => {
     // check if user entered its name otherwise alert
     if (this.state.name === '') {
       return Alert.alert('Please enter your name');
     }
     // navigate to Chat View and pass 'name' and 'backgroundColor' properties to it
     this.props.navigation.navigate('Chat', {
-      name: this.state.name,
-      backgroundColor: this.state.backgroundColor
+      name,
+      backgroundColor
     });
   };
 
@@ -69,7 +69,7 @@ export default class Start extends Component {
                 accessibilityHint="Takes you to the chat room"
                 accessibilityRole="button"
                 style={styles.button}
-                onPress={() => this.goToChat()}>
+                onPress={() => this.goToChat(this.state.name, this.state.backgroundColor)}>
                 <Text style={[styles.text, styles.buttonText]}>Start Chatting</Text>
               </TouchableOpacity>
             </View>

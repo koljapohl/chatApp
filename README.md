@@ -29,6 +29,7 @@ start of dev server
 + React-Scripts
 + React-Native
 + React-Navigation
++ React-native-gifted-chat
 
 ### dev-Dependencies
 
