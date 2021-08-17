@@ -2,8 +2,8 @@
 
 ## Project description
 
-This project's goal is to build a serverless, progressive web application with React using a test-driven development approach.
-The app will use the Google Calender API to fetch upcoming events.
+This project's objective is to build a chat app for mobile devices using React Native. The app will
+provide users with a chat interface and options to share images and their location.
 
 ## production handling
 
@@ -15,31 +15,12 @@ start of dev server
 
   ``npm run start`` OR ``expo start``
 
-the build will be deployed to [gh-pages](https://koljapohl.github.io/meet)
-
-for testing a serverless function locally run
-
-`serverless invoke local --function <FUNCTION_NAME>`
-
-deploy a serverless function
-
-`serverless deploy`
-
-for viewing previously deployed service
-
-`serverless info`
-
-run a local http server for a static HTML file for testing purposes (within test folder)
-
-`http-server`
-
-serves all files in the current directory on a local server
-
-to run unit tests (from main folder)
-
-`npm run test`
-
 ## Key features
+
+● A page where users can enter their name and choose a background color for the chat screen before joining the chat.
+● A page displaying the conversation, as well as an input field and submit button.
+● The chat must provide users with two additional communication features: sending images and location data.
+● Data gets stored online and offline.
 
 ## Dependencies
 
@@ -51,8 +32,4 @@ to run unit tests (from main folder)
 
 ### dev-Dependencies
 
-+ gh-pages
-
 ## API
-
-This project connects to the Google Calender API
