@@ -11,6 +11,9 @@ export default class Chat extends Component {
   }
 
   componentDidMount () {
+    // decompose the user's name that got sent from Start screen as a parameter
+    const { name } = this.props.route.params;
+    // set initial messages
     this.setState({
       messages: [
         {
@@ -25,7 +28,7 @@ export default class Chat extends Component {
         },
         {
           _id: 2,
-          text: 'This is a system message',
+          text: `Hi ${name} you entered the chat`,
           createdAt: new Date(),
           system: true,
         },
@@ -52,10 +55,11 @@ export default class Chat extends Component {
             backgroundColor: backgroundColor === '#090C08' ? '#8A95A5' :
               (backgroundColor === '#474056' || backgroundColor === '#8A95A5') ? '#B9C6AE' : '#474056'
           },
-          left: {
-            backgroundColor: backgroundColor === '#090C08' ? '#B9C6AE' :
-              (backgroundColor === '#474056' || backgroundColor === '#8A95A5') ? '#090C08' : '#8A95A5'
-          }
+          // left: {
+          //   backgroundColor: backgroundColor === '#090C08' ? '#B9C6AE' :
+          //     (backgroundColor === '#474056' || backgroundColor === '#8A95A5') ? '#090C08' : '#8A95A5',
+          //   color: (backgroundColor === '#090C08' || backgroundColor === '#474056') ? '#ffffff' : '#090C08'
+          // }
         }}
       />
     );
@@ -79,7 +83,7 @@ export default class Chat extends Component {
           isTyping={true}
           alwaysShowSend={true}
         />
-        {/* ensure the keyboard won't hide the messages for android*/}
+        {/* ensure the input field won't be hidden beneath the keyboard for android*/}
         {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null}
       </View>
     );
