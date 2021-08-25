@@ -19,7 +19,11 @@ export default class Chat extends Component {
     this.state = {
       uid: 0,
       messages: [],
-      isConnected: false
+      isConnected: false,
+      user: {
+        _id: '',
+        name: ''
+      }
     };
 
     if (!firebase.apps.length) {
@@ -32,6 +36,7 @@ export default class Chat extends Component {
     //check whether user is online
     NetInfo.fetch().then(connection => {
       if (connection.isConnected) {
+        this.setState({ isConnected: true });
         console.log('online');
         //check if user is signed in, if not create a new user
         this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
@@ -42,7 +47,11 @@ export default class Chat extends Component {
           this.referenceChatMessages = firebase.firestore().collection('messages');
           this.setState({
             uid: user.uid,
-            isConnected: true
+            messages: [],
+            user: {
+              _id: user.uid,
+              name: this.props.route.params.name
+            }
           });
           //create a snapshot every time the referenced collection gets updated
           this.unsubscribe = this.referenceChatMessages
@@ -58,9 +67,13 @@ export default class Chat extends Component {
   }
 
   componentWillUnmount () {
-    // when component unmounts stop receiving updates
-    this.unsubscribe();
-    this.authUnsubscribe();
+    if (this.state.isConnected) {
+      // when component unmounts stop receiving updates
+      this.unsubscribe();
+      this.authUnsubscribe();
+    } else {
+      this.deleteMessages();
+    }
   }
 
   // set up function to retrieve current data in collection and store in app's state
@@ -154,7 +167,7 @@ export default class Chat extends Component {
   }
 
   renderInputToolbar (props) {
-    if (this.state.isConnected == false) {
+    if (this.state.isConnected === false) {
     } else {
       return (
         <InputToolbar
@@ -174,13 +187,10 @@ export default class Chat extends Component {
       <View style={[styles.container, styles.setColor(backgroundColor)]}>
         <GiftedChat
           renderBubble={this.renderBubble.bind(this)}
-          renderInputToolbar={this.renderInputToolbar}
+          renderInputToolbar={this.renderInputToolbar.bind(this)}
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
-          user={{
-            _id: this.state.uid,
-            name
-          }}
+          user={this.state.user}
           isTyping={true}
           alwaysShowSend={true}
         />
