@@ -1,47 +1,84 @@
 import React, { Component } from 'react';
 import { View, Platform, KeyboardAvoidingView, StyleSheet } from 'react-native';
 import { Bubble, GiftedChat } from 'react-native-gifted-chat';
+import firebase from 'firebase';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA-OwFTrkVZ14yYughJAuAPKfXVbX-GOVs",
+  authDomain: "test-37e9d.firebaseapp.com",
+  projectId: "test-37e9d",
+  storageBucket: "test-37e9d.appspot.com",
+  messagingSenderId: "307865303179"
+};
 
 export default class Chat extends Component {
   constructor() {
     super();
     this.state = {
+      uid: 0,
       messages: []
     };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    this.referenceChatMessages = null;
   }
 
   componentDidMount () {
     // decompose the user's name that got sent from Start screen as a parameter
     const { name } = this.props.route.params;
-    // set initial messages
-    this.setState({
-      messages: [
-        {
-          _id: 1,
-          text: `Hello ${name}`,
-          createdAt: new Date(),
-          user: {
-            _id: 2,
-            name: "ChatBot",
-            avatar: "https://placeimg.com/140/140/any",
-          },
-        },
-        {
-          _id: 2,
-          text: `${name} entered the chat`,
-          createdAt: new Date(),
-          system: true,
-        },
-      ],
+    // create a reference to the collection 'messages' of the firestore db
+    this.referenceChatMessages = firebase.firestore().collection('messages');
+    //check if user is signed in, if not create a new user
+    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        await firebase.auth().signInAnonymously();
+      }
+      this.setState({
+        uid: user.uid,
+        messages: []
+      });
+      //create a snapshot every time the referenced collection gets updated
+      this.unsubscribe = this.referenceChatMessages
+        .orderBy("createdAt", "desc")
+        .onSnapshot(this.onCollectionUpdate);
     });
   }
 
-  // when a user sends a message it will be appended to the local messages state
-  onSend (messages = []) {
-    this.setState((previousState) => ({
-      messages: GiftedChat.append(previousState.messages, messages),
-    }));
+  componentWillUnmount () {
+    // when component unmounts stop receiving updates
+    this.unsubscribe();
+    this.authUnsubscribe();
   }
+
+  // set up function to retrieve current data in collection and store in app's state
+  onCollectionUpdate = (querySnapshot) => {
+    const messages = [];
+    querySnapshot.forEach((doc) => {
+      // get the QueryDocumentSnapshot's data
+      let data = doc.data();
+      messages.push({
+        _id: data._id,
+        text: data.text,
+        createdAt: data.createdAt.toDate(),
+        user: data.user
+      });
+      this.setState({
+        messages
+      });
+    });
+  };
+
+  addMessage = (message) => {
+    this.referenceChatMessages.add({
+      _id: message[0]._id,
+      text: message[0].text,
+      createdAt: message[0].createdAt,
+      user: message[0].user
+    });
+  };
+
 
   // '#090C08', '#474056', '#8A95A5', '#B9C6AE';
   // customize message bubble appearances
@@ -54,12 +91,7 @@ export default class Chat extends Component {
           right: {
             backgroundColor: backgroundColor === '#090C08' ? '#8A95A5' :
               (backgroundColor === '#474056' || backgroundColor === '#8A95A5') ? '#B9C6AE' : '#474056'
-          },
-          // left: {
-          //   backgroundColor: backgroundColor === '#090C08' ? '#B9C6AE' :
-          //     (backgroundColor === '#474056' || backgroundColor === '#8A95A5') ? '#090C08' : '#8A95A5',
-          //   color: (backgroundColor === '#090C08' || backgroundColor === '#474056') ? '#ffffff' : '#090C08'
-          // }
+          }
         }}
       />
     );
@@ -76,9 +108,10 @@ export default class Chat extends Component {
         <GiftedChat
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
-          onSend={(messages) => this.onSend(messages)}
+          onSend={(messages) => this.addMessage(messages)}
           user={{
-            _id: 1,
+            _id: this.state.uid,
+            name
           }}
           isTyping={true}
           alwaysShowSend={true}
