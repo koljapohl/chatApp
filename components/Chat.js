@@ -180,8 +180,12 @@ export default class Chat extends Component {
   render () {
     // decompose properties that got passed from Start-Screen through navigation
     let { name, backgroundColor } = this.props.route.params;
+    let offlineTitle = this.state.isConnected
+      ? '' : ' offline';
     // sets the title of the navigation bar to the user's name
-    this.props.navigation.setOptions({ title: name });
+    this.props.navigation.setOptions({
+      title: `${name} ${offlineTitle}`
+    });
 
     return (
       <View style={[styles.container, styles.setColor(backgroundColor)]}>
