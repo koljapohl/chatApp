@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
-import { View, Platform, KeyboardAvoidingView, StyleSheet, MapView } from 'react-native';
+import { View, Platform, KeyboardAvoidingView, StyleSheet } from 'react-native';
+import MapView from 'react-native-maps';
 import { Bubble, GiftedChat, InputToolbar } from 'react-native-gifted-chat';
 import firebase from 'firebase';
+import 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
+
+import CustomActions from './CustomActions';
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-OwFTrkVZ14yYughJAuAPKfXVbX-GOVs",
@@ -23,13 +27,16 @@ export default class Chat extends Component {
       user: {
         _id: '',
         name: ''
-      }
+      },
+      image: null,
+      location: null
     };
 
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    this.referenceChatMessages = null;
+    // create a reference to the collection 'messages' of the firestore db
+    this.referenceChatMessages = firebase.firestore().collection('messages');
   }
 
   componentDidMount () {
@@ -43,8 +50,7 @@ export default class Chat extends Component {
           if (!user) {
             await firebase.auth().signInAnonymously();
           }
-          // create a reference to the collection 'messages' of the firestore db
-          this.referenceChatMessages = firebase.firestore().collection('messages');
+
           this.setState({
             uid: user.uid,
             messages: [],
@@ -57,6 +63,7 @@ export default class Chat extends Component {
           this.unsubscribe = this.referenceChatMessages
             .orderBy("createdAt", "desc")
             .onSnapshot(this.onCollectionUpdate);
+          this.saveMessages();
         });
       } else {
         console.log('offline');
@@ -84,7 +91,9 @@ export default class Chat extends Component {
       let data = doc.data();
       messages.push({
         _id: data._id,
-        text: data.text,
+        text: data.text || null,
+        image: data.image || null,
+        location: data.location || null,
         createdAt: data.createdAt.toDate(),
         user: data.user
       });
@@ -114,9 +123,10 @@ export default class Chat extends Component {
     }), () => {
       // save messages to asyncStorage
       this.saveMessages();
+      // saves messages to firestore
+      this.addMessage(messages);
     });
-    this.addMessage(messages);
-  }
+  };
 
   // saves current messages from app's state to asyncStorage
   async saveMessages () {
@@ -131,7 +141,9 @@ export default class Chat extends Component {
   addMessage = (message) => {
     this.referenceChatMessages.add({
       _id: message[0]._id,
-      text: message[0].text,
+      text: message[0].text || null,
+      image: message[0].image || null,
+      location: message[0].location || null,
       createdAt: message[0].createdAt,
       user: message[0].user
     });
@@ -166,6 +178,7 @@ export default class Chat extends Component {
     );
   }
 
+  // when user is offline input toolbar is not rendered
   renderInputToolbar (props) {
     if (this.state.isConnected === false) {
     } else {
@@ -177,6 +190,12 @@ export default class Chat extends Component {
     }
   }
 
+  //renders the actionButton
+  renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
+  };
+
+  // renders user's location with MapView inside a chat bubble
   renderCustomView (props) {
     const { currentMessage } = props;
     if (currentMessage.location) {
@@ -216,6 +235,7 @@ export default class Chat extends Component {
           renderBubble={this.renderBubble.bind(this)}
           renderInputToolbar={this.renderInputToolbar.bind(this)}
           renderActions={this.renderCustomActions}
+          renderCustomView={this.renderCustomView}
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
           user={this.state.user}
