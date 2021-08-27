@@ -5,11 +5,16 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import Start from './components/Start';
 import Chat from './components/Chat';
+import CustomActions from './CustomActions';
 
 /* creates the navigator stack */
 const Stack = createStackNavigator();
 
 export default class App extends Component {
+  renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
+  };
+
   render () {
     return (
       <NavigationContainer>
