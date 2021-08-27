@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Platform, KeyboardAvoidingView, StyleSheet } from 'react-native';
+import { View, Platform, KeyboardAvoidingView, StyleSheet, MapView } from 'react-native';
 import { Bubble, GiftedChat, InputToolbar } from 'react-native-gifted-chat';
 import firebase from 'firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -177,6 +177,29 @@ export default class Chat extends Component {
     }
   }
 
+  renderCustomView (props) {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <MapView
+          style={{
+            width: 150,
+            height: 100,
+            borderRadius: 13,
+            margin: 3
+          }}
+          region={{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421
+          }}
+        />
+      );
+    }
+    return null;
+  }
+
   render () {
     // decompose properties that got passed from Start-Screen through navigation
     let { name, backgroundColor } = this.props.route.params;
@@ -192,6 +215,7 @@ export default class Chat extends Component {
         <GiftedChat
           renderBubble={this.renderBubble.bind(this)}
           renderInputToolbar={this.renderInputToolbar.bind(this)}
+          renderActions={this.renderCustomActions}
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
           user={this.state.user}
