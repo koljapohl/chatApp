@@ -30,7 +30,13 @@ start of dev server
 + React-Native
 + React-Navigation
 + React-native-gifted-chat
++ React-native-asyncStorage
++ Firebase Authentication
++ Firestore
 
 ### dev-Dependencies
 
 ## API
+
++ asyncStorage API
++ OS API
