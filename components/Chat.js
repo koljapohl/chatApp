@@ -48,7 +48,6 @@ export default class Chat extends Component {
 
           this.setState({
             uid: user.uid,
-            messages: [],
             user: {
               _id: user.uid,
               name: this.props.route.params.name
