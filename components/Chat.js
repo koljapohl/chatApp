@@ -1,21 +1,15 @@
 import React, { Component } from 'react';
-import { View, Platform, KeyboardAvoidingView, StyleSheet } from 'react-native';
+import { View, Platform, KeyboardAvoidingView, StyleSheet, LogBox } from 'react-native';
 import MapView from 'react-native-maps';
 import { Bubble, GiftedChat, InputToolbar } from 'react-native-gifted-chat';
-import firebase from 'firebase';
-import 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 
+import firebase from './firebase';
+import 'firebase/firestore';
 import CustomActions from './CustomActions';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA-OwFTrkVZ14yYughJAuAPKfXVbX-GOVs",
-  authDomain: "test-37e9d.firebaseapp.com",
-  projectId: "test-37e9d",
-  storageBucket: "test-37e9d.appspot.com",
-  messagingSenderId: "307865303179"
-};
+LogBox.ignoreLogs(['Setting a timer']);
 
 export default class Chat extends Component {
   constructor() {
@@ -32,9 +26,6 @@ export default class Chat extends Component {
       location: null
     };
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
     // create a reference to the collection 'messages' of the firestore db
     this.referenceChatMessages = firebase.firestore().collection('messages');
   }
@@ -44,7 +35,11 @@ export default class Chat extends Component {
     NetInfo.fetch().then(connection => {
       if (connection.isConnected) {
         this.setState({ isConnected: true });
-        console.log('online');
+        //create a snapshot every time the referenced collection gets updated
+        this.unsubscribe = this.referenceChatMessages
+          .orderBy("createdAt", "desc")
+          .onSnapshot(this.onCollectionUpdate);
+        this.saveMessages();
         //check if user is signed in, if not create a new user
         this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
           if (!user) {
@@ -52,18 +47,13 @@ export default class Chat extends Component {
           }
 
           this.setState({
-            uid: user.uid,
+            uid: user._uid,
             messages: [],
             user: {
-              _id: user.uid,
+              _id: user._uid,
               name: this.props.route.params.name
             }
           });
-          //create a snapshot every time the referenced collection gets updated
-          this.unsubscribe = this.referenceChatMessages
-            .orderBy("createdAt", "desc")
-            .onSnapshot(this.onCollectionUpdate);
-          this.saveMessages();
         });
       } else {
         console.log('offline');
@@ -121,10 +111,10 @@ export default class Chat extends Component {
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages)
     }), () => {
+      // saves messages to firestore
+      this.addMessage();
       // save messages to asyncStorage
       this.saveMessages();
-      // saves messages to firestore
-      this.addMessage(messages);
     });
   };
 
@@ -138,14 +128,15 @@ export default class Chat extends Component {
   }
 
   // add's new message to Firestore
-  addMessage = (message) => {
+  addMessage = () => {
+    const message = this.state.messages[0];
     this.referenceChatMessages.add({
-      _id: message[0]._id,
-      text: message[0].text || null,
-      image: message[0].image || null,
-      location: message[0].location || null,
-      createdAt: message[0].createdAt,
-      user: message[0].user
+      _id: message._id,
+      text: message.text || null,
+      image: message.image || null,
+      location: message.location || null,
+      createdAt: message.createdAt,
+      user: message.user
     });
   };
 
