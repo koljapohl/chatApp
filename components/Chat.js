@@ -15,7 +15,7 @@ export default class Chat extends Component {
   constructor() {
     super();
     this.state = {
-      uid: 0,
+      uid: '',
       messages: [],
       isConnected: false,
       user: {
@@ -47,10 +47,10 @@ export default class Chat extends Component {
           }
 
           this.setState({
-            uid: user._uid,
+            uid: user.uid,
             messages: [],
             user: {
-              _id: user._uid,
+              _id: user.uid,
               name: this.props.route.params.name
             }
           });
@@ -239,8 +239,6 @@ export default class Chat extends Component {
     );
   }
 };
-
-// TODO: add accessibility props to the action button implemented
 
 const styles = StyleSheet.create({
   container: {
