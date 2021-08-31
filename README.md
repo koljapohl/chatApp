@@ -25,6 +25,7 @@ provide users with a chat interface and options to share images and their locati
 + Expo
 + Expo-image-picker
 + Expo-location
++ Gifted Chat
 
 ## Tools used
 
@@ -33,22 +34,28 @@ provide users with a chat interface and options to share images and their locati
 + Firebase Authentication (anonymously)
 + Firestore DB
 + Firebase Storage
++ Android Studio
 
 ## API
 
 + asyncStorage API
 + OS API
 
-## set up this project
+## getting started
 
-+ install expo-cli with
+Requirements:
+
++ Node.js
++ Expo command line interface
 
 `npm install -g expo-cli`
 
+## Setup
+
 + clone repo to your hard drive
-+ set up a Firebase project, a firestore DB that holds a 'messages' collection
-+ set up a Storage with default configuration
-+ go to components/Chat.js and set your firebaseConfig credentials
++ install dependencies
+
+`npm install`
 
 + within root folder start of dev server by
 
