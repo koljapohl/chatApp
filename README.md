@@ -25,7 +25,6 @@ provide users with a chat interface and options to share images and their locati
 + Expo
 + Expo-image-picker
 + Expo-location
-+ Gifted Chat
 
 ## Tools used
 

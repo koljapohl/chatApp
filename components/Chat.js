@@ -9,7 +9,7 @@ import firebase from './firebase';
 import 'firebase/firestore';
 import CustomActions from './CustomActions';
 
-LogBox.ignoreLogs(['Setting a timer']);
+LogBox.ignoreLogs(['Setting a timer', 'Animated.event', 'Cannot update']);
 
 export default class Chat extends Component {
   constructor() {
@@ -35,16 +35,16 @@ export default class Chat extends Component {
     NetInfo.fetch().then(connection => {
       if (connection.isConnected) {
         this.setState({ isConnected: true });
-        //create a snapshot every time the referenced collection gets updated
-        this.unsubscribe = this.referenceChatMessages
-          .orderBy("createdAt", "desc")
-          .onSnapshot(this.onCollectionUpdate);
-        this.saveMessages();
         //check if user is signed in, if not create a new user
         this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
           if (!user) {
             await firebase.auth().signInAnonymously();
           }
+          //create a snapshot every time the referenced collection gets updated
+          this.unsubscribe = this.referenceChatMessages
+            .orderBy("createdAt", "desc")
+            .onSnapshot(this.onCollectionUpdate);
+          this.saveMessages();
 
           this.setState({
             uid: user.uid,
@@ -63,13 +63,8 @@ export default class Chat extends Component {
   }
 
   componentWillUnmount () {
-    if (this.state.isConnected) {
-      // when component unmounts stop receiving updates
-      this.unsubscribe();
-      this.authUnsubscribe();
-    } else {
-      this.deleteMessages();
-    }
+    this.unsubscribe();
+    this.authUnsubscribe();
   }
 
   // set up function to retrieve current data in collection and store in app's state
