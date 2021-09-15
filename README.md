@@ -2,44 +2,15 @@
 
 ## Project description
 
-This project's goal is to build a serverless, progressive web application with React using a test-driven development approach.
-The app will use the Google Calender API to fetch upcoming events.
-
-## production handling
-
-initialize new project
-
-  ``expo init <project name>``
-
-start of dev server
-
-  ``npm run start`` OR ``expo start``
-
-the build will be deployed to [gh-pages](https://koljapohl.github.io/meet)
-
-for testing a serverless function locally run
-
-`serverless invoke local --function <FUNCTION_NAME>`
-
-deploy a serverless function
-
-`serverless deploy`
-
-for viewing previously deployed service
-
-`serverless info`
-
-run a local http server for a static HTML file for testing purposes (within test folder)
-
-`http-server`
-
-serves all files in the current directory on a local server
-
-to run unit tests (from main folder)
-
-`npm run test`
+This project's objective is to build a chat app for mobile devices using React Native. The app will
+provide users with a chat interface and options to share images and their location.
 
 ## Key features
+
+● A page where users can enter their name and choose a background color for the chat screen before joining the chat.
+● A page displaying the conversation, as well as an input field and submit button.
+● The chat must provide users with two additional communication features: sending images and location data.
+● Data gets stored online and offline.
 
 ## Dependencies
 
@@ -48,11 +19,45 @@ to run unit tests (from main folder)
 + React-Scripts
 + React-Native
 + React-Navigation
++ React-native-gifted-chat
++ React-native-asyncStorage
++ Firebase
++ Expo
++ Expo-image-picker
++ Expo-location
 
-### dev-Dependencies
+## Tools used
 
-+ gh-pages
++ React Native
++ Expo
++ Firebase Authentication (anonymously)
++ Firestore DB
++ Firebase Storage
++ Android Studio
 
 ## API
 
-This project connects to the Google Calender API
++ asyncStorage API
++ OS API
+
+## getting started
+
+Requirements:
+
++ Node.js
++ Expo command line interface
+
+`npm install -g expo-cli`
+
+## Setup
+
++ clone repo to your hard drive
++ install dependencies
+
+`npm install`
+
++ within root folder start of dev server by
+
+`npm run start` OR `expo start`
+
++ run chatApp with an emulator/simulator of your choice or via the ExpoGo application on your physical device
